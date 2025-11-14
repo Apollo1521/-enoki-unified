@@ -16,11 +16,11 @@ using namespace websockets;
 #define LATCH_PIN 15
 
 // LED bit positions
-#define LED_RED 0
-#define LED_GREEN 1
-#define LED_BLUE 2
-#define LED_YELLOW 3
-#define LED_WHITE 4
+#define LED0 0
+#define LED1 1
+#define LED2 2
+#define LED3 3
+#define LED4 4
 
 byte ledState = 0b00000000;
 
@@ -36,11 +36,11 @@ struct LedInf {
 };
 
 LedInf ledList[] = {
-  { LED_RED, "f23c991d", "red" },
-  { LED_GREEN, "a3337cd6", "red" },
-  { LED_BLUE, "56c10d14", "yellow" },
-  { LED_YELLOW, "459a6ad0", "yellow" },
-  { LED_WHITE, "635ee1a3", "blue" }
+  { LED0, "f23c991d", "red" },
+  { LED1, "a3337cd6", "red" },
+  { LED2, "56c10d14", "yellow" },
+  { LED3, "459a6ad0", "yellow" },
+  { LED4, "635ee1a3", "blue" }
 };
 
 // === Globals ===
@@ -213,7 +213,8 @@ void setupWebSocket() {
   init["institutionId"] = enokiInst;
 
   JsonArray leds = init.createNestedArray("ledArray");
-  for (int i = 0; i < 5; i++) {
+  int ledCount = sizeof(ledList) / sizeof(ledList[0]); // ledList -- bytes divided by size of one element
+  for (int i = 0; i < ledCount; i++) {
     JsonObject ledObj = leds.createNestedObject();
     ledObj["idx"] = ledList[i].addr;
     ledObj["ledUq"] = ledList[i].uq;
