@@ -12,7 +12,7 @@ export default function useEnokiMutator() {
           password,
         }
       );
-      console.log("Succes?");
+      console.log("Success. ", process.env.EXPO_PUBLIC_API_URL);
       return response;
     },
   });

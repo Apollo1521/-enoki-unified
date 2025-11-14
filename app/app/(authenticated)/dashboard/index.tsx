@@ -3,9 +3,9 @@ import { useLoader } from "@/components/UseLoaderContext";
 import useEnokiMutator from "@/hooks/useEnokiMutator";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -225,6 +225,7 @@ export default function Dashboard() {
     data: userData = null,
     isPending: userDataPending,
     isError: userDataIsError,
+    refetch: userDataRefetch,
   } = useQuery({
     queryFn: async () => {
       const res = await axios.post(
@@ -247,11 +248,17 @@ export default function Dashboard() {
     setCurrentUser(userData);
   }, [userData]);
 
+  useFocusEffect(
+    useCallback(() => {
+      userDataRefetch();
+    }, [userDataRefetch])
+  );
+
   return (
     <>
       {userDataPending && (
         <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color="black" />
         </View>
       )}
 

@@ -95,7 +95,7 @@ const cleanupPort = () => {
   }
 };
 
-// openPort();
+openPort();
 
 const app = express();
 const server = createServer(app);
@@ -103,6 +103,11 @@ const server = createServer(app);
 const corsInstance = cors({
   origin: process.env.ORIGIN,
   credentials: true,
+});
+
+app.use((req, res, next) => {
+  console.log("Incoming request", req.method, req.url);
+  next();
 });
 
 app.use(corsInstance);
@@ -151,6 +156,15 @@ const firstSetupEnokiLedSystem = async (dx) => {
       },
       data: {
         currentState: dx.currentState,
+        physicalLeds: {
+          updateMany: dx.ledArray.map((led) => ({
+            where: { ledUq: led.ledUq },
+            data: {
+              color: led.color,
+              idx: led.idx,
+            },
+          })),
+        },
       },
     });
     return;
@@ -275,46 +289,45 @@ cron.schedule("* * * * *", async () => {
         emitToSocket(socketId, "sig", { type: "STATUS-CHANGE-SCANNER" });
       }
       emitToAll("sig", { type: "STATUS-CHANGE", data: null });
-      return;
+      continue;
     }
 
-    for (const classTime of currentSchedule.classTimes) {
-      if (
-        moment().isBetween(
-          moment().startOf("day").add(classTime.cS, "seconds"),
-          moment().startOf("day").add(classTime.cE, "seconds")
-        )
-      ) {
-        await prisma.teacherStatistics.update({
-          where: {
-            id: stat.id,
-          },
-          data: {
-            status: "IN_CLASS",
-          },
-        });
+    const nowClass = currentSchedule.classTimes.find((classTime) =>
+      moment().isBetween(
+        moment().startOf("day").add(classTime.cS, "seconds"),
+        moment().startOf("day").add(classTime.cE, "seconds")
+      )
+    );
 
-        if (socketId) {
-          emitToSocket(socketId, "sig", { type: "STATUS-CHANGE-SCANNER" });
-        }
-        emitToAll("sig", { type: "STATUS-CHANGE", data: null });
-        return;
-      } else {
-        await prisma.teacherStatistics.update({
-          where: {
-            id: stat.id,
-          },
-          data: {
-            status: "OUT",
-          },
-        });
+    if (nowClass) {
+      await prisma.teacherStatistics.update({
+        where: {
+          id: stat.id,
+        },
+        data: {
+          status: "IN_CLASS",
+        },
+      });
 
-        if (socketId) {
-          emitToSocket(socketId, "sig", { type: "STATUS-CHANGE-SCANNER" });
-        }
-        emitToAll("sig", { type: "STATUS-CHANGE", data: null });
-        return;
+      if (socketId) {
+        emitToSocket(socketId, "sig", { type: "STATUS-CHANGE-SCANNER" });
       }
+      emitToAll("sig", { type: "STATUS-CHANGE", data: null });
+      continue;
     }
+
+    await prisma.teacherStatistics.update({
+      where: {
+        id: stat.id,
+      },
+      data: {
+        status: "OUT",
+      },
+    });
+
+    if (socketId) {
+      emitToSocket(socketId, "sig", { type: "STATUS-CHANGE-SCANNER" });
+    }
+    emitToAll("sig", { type: "STATUS-CHANGE", data: null });
   }
 });

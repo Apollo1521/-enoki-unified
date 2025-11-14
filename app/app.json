@@ -16,6 +16,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.enokiappdevph.app",
+      "usesCleartextTraffic": true,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -40,7 +41,15 @@
       ],
       "expo-font",
       "expo-secure-store",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

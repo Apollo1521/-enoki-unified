@@ -44,7 +44,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUserId(userData.id);
         }
       } catch (e) {
-        console.log("FAIL", e);
       } finally {
         setLoading(false);
       }
@@ -54,16 +53,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const __login = async (email: string, password: string) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const rst = await login.mutateAsync({ email, password });
-    console.log(rst.data.token);
+
     await saveSecure("enokiAuthToken", rst.data.token);
     const userData: any = jwtDecode(rst.data.token);
-    console.log("HELLO");
+
     setUserId(userData.id);
     if (userData?.rds) {
-      console.log("NOx");
       expoRouter.replace("/onboarding");
     } else {
-      console.log("REPLACING?");
       expoRouter.replace("/(authenticated)/dashboard");
     }
     return;
@@ -89,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     >
       {loading && (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color="black" />
         </View>
       )}
 

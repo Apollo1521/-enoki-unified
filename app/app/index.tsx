@@ -6,5 +6,9 @@ export default function Index() {
 
   if (loading) return null;
 
-  return !userId ? <Redirect href="/login" /> : null;
+  return !userId ? (
+    <Redirect href="/login" />
+  ) : (
+    <Redirect href="/(authenticated)/dashboard" />
+  );
 }

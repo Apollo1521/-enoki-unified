@@ -3,8 +3,8 @@ import { useLoader } from "@/components/UseLoaderContext";
 import useEnokiMutator from "@/hooks/useEnokiMutator";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useNavigation } from "expo-router";
-import React, { useState } from "react";
+import { useFocusEffect, useNavigation } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -100,6 +100,7 @@ export default function Messages() {
     data: messagesData = [],
     isPending: messagesPending,
     isError: messagesIsError,
+    refetch: messagesRefetch,
   } = useQuery({
     queryFn: async () => {
       const res = await axios.post(
@@ -120,6 +121,12 @@ export default function Messages() {
       return count + group.messages.filter((msg) => !msg.isRead).length;
     },
     0
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      messagesRefetch();
+    }, [messagesRefetch])
   );
 
   return (

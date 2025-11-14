@@ -425,6 +425,10 @@ export default function AddEditTeacherModal({
   const handleSave = async () => {
     const ok1 = await validateStepZero();
     if (!ok1) return;
+    if (feed?.schedule) {
+      // refeed data if exited
+      feedScheduleData(feed?.schedule);
+    }
 
     setStep(1);
   };
