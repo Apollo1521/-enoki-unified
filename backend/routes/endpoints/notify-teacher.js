@@ -80,7 +80,13 @@ export default async function notifyTeacher(req, res) {
     }
 
     if (teacher.notificationLED) {
+      if (
+        !enokiLedSystems.has(teacher.notificationLED.enokiLEDSystem.deviceSID)
+      )
+        return;
+
       console.log("Turning on LED");
+
       const newLEDSystemState =
         (teacher.notificationLED.enokiLEDSystem.currentState |=
           1 << teacher.notificationLED.idx);
@@ -93,6 +99,7 @@ export default async function notifyTeacher(req, res) {
         },
       });
       console.log("LED Turned on");
+
       enokiLedSystems
         .get(teacher.notificationLED.enokiLEDSystem.deviceSID)
         .send(

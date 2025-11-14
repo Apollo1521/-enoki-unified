@@ -156,6 +156,15 @@ const firstSetupEnokiLedSystem = async (dx) => {
       },
       data: {
         currentState: dx.currentState,
+        physicalLeds: {
+          updateMany: dx.ledArray.map((led) => ({
+            where: { ledUq: led.ledUq },
+            data: {
+              color: led.color,
+              idx: led.idx,
+            },
+          })),
+        },
       },
     });
     return;

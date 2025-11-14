@@ -15,7 +15,7 @@
 #define RST_PIN 22   // RST
 
 // --- API endpoint for RFID POST ---
-const char* API_ENDPOINT = "http://192.168.18.111:8000/api/alpha/in-sens";
+const char* API_ENDPOINT = "https://enoki.henchgalphilippines.com/api/beta/in-sens";
 const unsigned long POST_TIMEOUT_MS = 5000;
 
 WebServer server(80);
