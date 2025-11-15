@@ -16,13 +16,13 @@ export default async (req, res) => {
   try {
     await prisma.enokiAcct.update({
       where: {
-        studentId: id
+        studentId: id,
       },
       data: {
         name,
         email,
-      }
-    })
+      },
+    });
 
     await prisma.student.update({
       where: {
@@ -30,7 +30,7 @@ export default async (req, res) => {
       },
       data: {
         studentId,
-        studentRfidHash,
+        studentRfidHash: studentRfidHash.trim().toUpperCase(),
         course: {
           connect: {
             id: courseId,
@@ -41,7 +41,7 @@ export default async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(400).json({ success: false, error: error.message });
   }
 };
