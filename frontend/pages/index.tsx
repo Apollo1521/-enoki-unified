@@ -408,6 +408,7 @@ export default function Home({ user }: { user: any }) {
                                           timestamp={
                                             teacher.statistics.updatedAt
                                           }
+                                          cap={true}
                                         />
                                       </p>
                                     </div>
