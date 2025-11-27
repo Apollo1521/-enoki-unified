@@ -52,6 +52,7 @@ interface StudentCall {
   calledAt: string;
   id: string;
   callType: any;
+  attended: boolean;
 }
 
 ChartJS.register(
