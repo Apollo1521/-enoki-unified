@@ -1,4 +1,5 @@
 import { useAuth } from "@/components/AuthContext";
+import { useSocket } from "@/components/SocketContext";
 import { useLoader } from "@/components/UseLoaderContext";
 import useEnokiMutator from "@/hooks/useEnokiMutator";
 import { useQuery } from "@tanstack/react-query";
@@ -45,6 +46,7 @@ const getTimeBasedGreeting = () => {
 export default function Dashboard() {
   const { show: showLoader, hide: hideLoader } = useLoader();
   const { changeStatus } = useEnokiMutator();
+  const { isConnected } = useSocket();
 
   const opacity = useSharedValue(0); // start invisible
   const translateY = useSharedValue(Dimensions.get("window").height);
@@ -254,6 +256,21 @@ export default function Dashboard() {
     }, [userDataRefetch])
   );
 
+  const [showConnected, setShowConnected] = useState(false);
+
+  useEffect(() => {
+    if (isConnected) {
+      setShowConnected(true);
+      setTimeout(() => {
+        setShowConnected(false);
+      }, 5000);
+    }
+  }, [isConnected]);
+
+  const handleCallAttendance = () => {
+    expoRouter.push("/(authenticated)/attendance");
+  };
+
   return (
     <>
       {userDataPending && (
@@ -278,6 +295,20 @@ export default function Dashboard() {
       {!userDataPending && userData && (
         <View className="flex-1 bg-white">
           {/* Header */}
+          {!isConnected && (
+            <View className="h-[24px] bg-yellow-500 justify-center items-center">
+              <Text className="text-sm text-center">
+                Connecting to server. Live updates might not be available.
+              </Text>
+            </View>
+          )}
+
+          {showConnected && (
+            <View className="h-[24px] bg-green-500 justify-center items-center">
+              <Text className="text-sm text-center text-white">Connected.</Text>
+            </View>
+          )}
+
           <View className="pt-9 pb-3 px-6 pb-1">
             <View className="flex flex-row items-center justify-between">
               <View>
@@ -402,7 +433,6 @@ export default function Dashboard() {
               </View>
             </View>
           </ScrollView>
-
           {/* Status Menu Overlay */}
           {showStatusMenu && (
             <View className="absolute inset-0 bg-black/20 justify-end">
@@ -431,7 +461,6 @@ export default function Dashboard() {
               </View>
             </View>
           )}
-
           {showMenu && (
             <Animated.View
               style={animatedStyle}
@@ -447,6 +476,14 @@ export default function Dashboard() {
                 </Text>
 
                 <View className="space-y-3">
+                  <Pressable
+                    className="flex-row items-center p-4 rounded-xl active:bg-gray-200"
+                    onPress={() => handleCallAttendance()}
+                  >
+                    <Text className="flex-1 text-gray-900 font-poppins-semibold text-lg">
+                      Call Attendance
+                    </Text>
+                  </Pressable>
                   <Pressable
                     className="flex-row items-center p-4 rounded-xl active:bg-gray-200"
                     onPress={() => handleShowStatusModifier()}
@@ -467,7 +504,6 @@ export default function Dashboard() {
               </Animated.View>
             </Animated.View>
           )}
-
           {/* Comeback Time Modal */}
           {showComebackModal && (
             <View className="absolute inset-0 bg-black/50 justify-center items-center px-6">
@@ -562,7 +598,6 @@ export default function Dashboard() {
               </View>
             </View>
           )}
-
           {/* Logout Confirmation Modal */}
           {showLogoutModal && (
             <View className="absolute inset-0 bg-black/50 justify-center items-center px-6">
@@ -598,7 +633,6 @@ export default function Dashboard() {
               </View>
             </View>
           )}
-
           {/* Floating Action Button */}
           {!showStatusMenu &&
             !showMenu &&

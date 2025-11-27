@@ -10,11 +10,18 @@ export default async function getStudentCalls(req, res) {
   }
 
   try {
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
     const calls = await prisma.callTeacher.findMany({
       where: {
         institutionId,
+        calledAt: {
+          gte: sevenDaysAgo,
+        },
       },
       select: {
+        attended: true,
         callType: true,
         teacher: {
           select: {

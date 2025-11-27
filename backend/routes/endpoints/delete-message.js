@@ -16,6 +16,7 @@ export default async function deleteMessage(req, res) {
       },
       data: {
         isDeleted: true,
+        message: "",
       },
     });
 

@@ -30,7 +30,7 @@ import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import TimeAgoComponent from "@/components/TimeAgo";
-import { useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRfidSocket } from "@/utils/useRfidSocket";
 import moment from "moment";
@@ -222,6 +222,31 @@ export default function Home({ user }: { user: any }) {
     soundFile: "notification.mp3",
   });
 
+  const downloadCallsheet = useCallback(async () => {
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/export-callsheet`,
+        { institutionId: user.institutionId },
+        {
+          responseType: "blob",
+        }
+      );
+
+      const blob = new Blob([res.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "student-calls.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {}
+  }, [user.institutionId]);
+
   return (
     <>
       <Head>
@@ -407,14 +432,22 @@ export default function Home({ user }: { user: any }) {
               {/* Recent Activity Panel */}
               <div className="col-span-2 bg-white border border-neutral-200 rounded-xl call-graph p-6">
                 <div className="h-full flex flex-col">
-                  <h2
-                    className={`${spaceGrotesk.className} font-[700] text-lg text-gray-800 mb-6 flex items-center gap-2`}
-                  >
-                    <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                      <IdCard size="15" className="text-white" />
-                    </div>{" "}
-                    Recent Kiosk Student Scans
-                  </h2>
+                  <div className="flex justify-between items-center mb-6 ">
+                    <h2
+                      className={`${spaceGrotesk.className} font-[700] text-lg text-gray-800 flex items-center gap-2`}
+                    >
+                      <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
+                        <IdCard size="15" className="text-white" />
+                      </div>{" "}
+                      Recent Kiosk Student Scans
+                    </h2>
+                    <button
+                      onClick={() => downloadCallsheet()}
+                      className="bg-blue-600 text-white px-5 py-1 font-[500] rounded-full"
+                    >
+                      Export All Data
+                    </button>
+                  </div>
 
                   <div className="flex-1 overflow-y-auto space-y-4">
                     {studentCallsPending && (
@@ -498,6 +531,9 @@ export default function Home({ user }: { user: any }) {
                                     {moment(call.calledAt).format("hh:mm:ss A")}
                                   </span>
                                   <span>{call.callType}</span>
+                                  {call.callType === "NOTIFY" && (
+                                    <span>{call.attended ? "Yes" : "No"}</span>
+                                  )}
                                 </div>
                               </div>
                             </div>

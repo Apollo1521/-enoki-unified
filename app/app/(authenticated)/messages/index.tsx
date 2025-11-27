@@ -213,7 +213,7 @@ export default function Messages() {
 
           {messagesPending && (
             <View className="flex flex-row gap-5 mx-auto font-poppins-semibold">
-              <ActivityIndicator color="black" />{" "}
+              <ActivityIndicator color="black" />
               <Text className="font-[500]">Fetching messages...</Text>
             </View>
           )}

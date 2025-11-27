@@ -79,71 +79,74 @@ export default async function notifyTeacher(req, res) {
       );
     }
 
+    console.log("Executed");
+
     if (teacher.notificationLED) {
       if (
-        !enokiLedSystems.has(teacher.notificationLED.enokiLEDSystem.deviceSID)
-      )
-        return;
+        enokiLedSystems.has(teacher.notificationLED.enokiLEDSystem.deviceSID)
+      ) {
+        console.log("Turning on LED");
 
-      console.log("Turning on LED");
-
-      const newLEDSystemState =
-        (teacher.notificationLED.enokiLEDSystem.currentState |=
-          1 << teacher.notificationLED.idx);
-      await prisma.enokiLEDSystem.update({
-        where: {
-          deviceSID: teacher.notificationLED.enokiLEDSystem.deviceSID,
-        },
-        data: {
-          currentState: newLEDSystemState,
-        },
-      });
-      console.log("LED Turned on");
-
-      enokiLedSystems
-        .get(teacher.notificationLED.enokiLEDSystem.deviceSID)
-        .send(
-          JSON.stringify({
-            type: "update",
-            state: newLEDSystemState,
-          })
-        );
-      console.log("Turning off LED");
-      setTimeout(async () => {
-        const val = await prisma.enokiLEDSystem.findUnique({
-          where: {
-            deviceSID: teacher.notificationLED.enokiLEDSystem.deviceSID,
-          },
-          select: {
-            currentState: true,
-          },
-        }); // race condition prevention
-
-        const disablingState = (val.currentState &= ~(
-          1 << teacher.notificationLED.idx
-        ));
+        const newLEDSystemState =
+          (teacher.notificationLED.enokiLEDSystem.currentState |=
+            1 << teacher.notificationLED.idx);
         await prisma.enokiLEDSystem.update({
           where: {
             deviceSID: teacher.notificationLED.enokiLEDSystem.deviceSID,
           },
           data: {
-            currentState: disablingState,
+            currentState: newLEDSystemState,
           },
         });
-        console.log("LED Turned off");
+        console.log("LED Turned on");
+
         enokiLedSystems
           .get(teacher.notificationLED.enokiLEDSystem.deviceSID)
           .send(
             JSON.stringify({
               type: "update",
-              state: disablingState,
+              state: newLEDSystemState,
             })
           );
-      }, parseInt(process.env.ENOKI_LED_SYSTEM_TIMEOUT));
+        console.log("Turning off LED");
+        setTimeout(async () => {
+          const val = await prisma.enokiLEDSystem.findUnique({
+            where: {
+              deviceSID: teacher.notificationLED.enokiLEDSystem.deviceSID,
+            },
+            select: {
+              currentState: true,
+            },
+          }); // race condition prevention
+
+          const disablingState = (val.currentState &= ~(
+            1 << teacher.notificationLED.idx
+          ));
+          await prisma.enokiLEDSystem.update({
+            where: {
+              deviceSID: teacher.notificationLED.enokiLEDSystem.deviceSID,
+            },
+            data: {
+              currentState: disablingState,
+            },
+          });
+          console.log("LED Turned off");
+          enokiLedSystems
+            .get(teacher.notificationLED.enokiLEDSystem.deviceSID)
+            .send(
+              JSON.stringify({
+                type: "update",
+                state: disablingState,
+              })
+            );
+        }, parseInt(process.env.ENOKI_LED_SYSTEM_TIMEOUT));
+      }
     }
 
+    console.log("ASDKJASHDKAJSDHASKJDHASKLDJAHSDLAKSJHDKLJ");
     return res.status(200).json({ success: true });
   } catch (e) {
+    console.log(e);
     return res.status(500).json({ success: false, error: "SERVER_ERROR" });
   }
 }

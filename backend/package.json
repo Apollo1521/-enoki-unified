@@ -25,7 +25,8 @@
     "prisma": "^6.15.0",
     "serialport": "^13.0.0",
     "socket.io": "^4.8.1",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "supabase": "^2.48.3"

@@ -12,6 +12,7 @@ export default async function getStudentCallHistory(req, res) {
         studentId: id,
       },
       select: {
+        attended: true,
         callType: true,
         studentId: true,
         calledAt: true,

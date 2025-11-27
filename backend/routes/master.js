@@ -53,6 +53,10 @@ import outSens from "./endpoints/out-sens.js";
 import getEnokiLedSystem from "./endpoints/get-enokiLedSystem.js";
 import linkLedToTeacher from "./endpoints/link-led-to-teacher.js";
 import onboardPassword from "./endpoints/onboard-password.js";
+import downloadCallsheet from "./endpoints/download-callsheet.js";
+import getAttendanceList from "./endpoints/get-attendance-calls.js";
+import getAttendanceCalls from "./endpoints/get-attendance-calls.js";
+import markAttendance from "./endpoints/mark-attendance.js";
 
 const router = express.Router();
 
@@ -150,5 +154,8 @@ router.post("/get-enokiLedSystem", getEnokiLedSystem);
 router.post("/link-led-to-teacher", linkLedToTeacher);
 
 router.post("/onboarding-password", onboardPassword);
+router.post("/export-callsheet", downloadCallsheet);
+router.post("/get-attendance-calls", getAttendanceCalls);
+router.post("/mark-attendance", markAttendance);
 
 export default router;

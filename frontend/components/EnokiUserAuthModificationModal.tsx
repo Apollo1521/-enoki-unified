@@ -3,7 +3,7 @@ import { useEnokiMutator } from "@/hooks/useEnokiMutator";
 import { useEnokiValidators } from "@/hooks/useEnokiValidators";
 import { CircularProgress } from "@mui/material";
 import axios from "axios";
-import { Save, X } from "lucide-react";
+import { Save, X, Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import z from "zod";
 
@@ -32,6 +32,9 @@ export default function EnokiUserAuthModificationModal({
   const { changeAccount } = useEnokiMutator();
   const { checkEmail } = useEnokiValidators();
   const enokiModal = useEnokiModals();
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const [localData, setLocalData] = useState({
     name: {
       v: "",
@@ -473,22 +476,35 @@ export default function EnokiUserAuthModificationModal({
                       <label className="block text-sm font-medium text-slate-700">
                         New Password <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="password"
-                        value={localData.newPassword}
-                        onChange={(e) =>
-                          setLocalData({
-                            ...localData,
-                            newPassword: e.target.value,
-                          })
-                        }
-                        className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          localData.nwpPasswordError
-                            ? "border-red-500"
-                            : "border-slate-300"
-                        }`}
-                        placeholder="Enter new password"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          value={localData.newPassword}
+                          onChange={(e) =>
+                            setLocalData({
+                              ...localData,
+                              newPassword: e.target.value,
+                            })
+                          }
+                          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            localData.nwpPasswordError
+                              ? "border-red-500"
+                              : "border-slate-300"
+                          }`}
+                          placeholder="Enter new password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                          )}
+                        </button>
+                      </div>
                       {localData.nwpPasswordError && (
                         <p className="text-red-500 text-sm flex items-center gap-1">
                           <X size={14} /> {localData.nwpPasswordError}
@@ -506,22 +522,35 @@ export default function EnokiUserAuthModificationModal({
                           Confirm Password{" "}
                           <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="password"
-                          value={localData.confirmPassword}
-                          onChange={(e) =>
-                            setLocalData({
-                              ...localData,
-                              confirmPassword: e.target.value,
-                            })
-                          }
-                          className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            localData.cfpwPasswordError
-                              ? "border-red-500"
-                              : "border-slate-300"
-                          }`}
-                          placeholder="Confirm new password"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={localData.confirmPassword}
+                            onChange={(e) =>
+                              setLocalData({
+                                ...localData,
+                                confirmPassword: e.target.value,
+                              })
+                            }
+                            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              localData.cfpwPasswordError
+                                ? "border-red-500"
+                                : "border-slate-300"
+                            }`}
+                            placeholder="Confirm new password"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            )}
+                          </button>
+                        </div>
                         {localData.cfpwPasswordError && (
                           <p className="text-red-500 text-sm flex items-center gap-1">
                             <X size={14} /> {localData.cfpwPasswordError}

@@ -17,6 +17,10 @@ export default function RootLayout() {
               name="messages/index"
               options={{ headerShown: false }}
             />
+            <Stack.Screen
+              name="attendance/index"
+              options={{ headerShown: false }}
+            />
           </Stack>
         </SocketProvider>
       </LoadProvider>
